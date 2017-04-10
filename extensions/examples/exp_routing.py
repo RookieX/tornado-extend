@@ -15,7 +15,7 @@ from extensions.routing import route
 # 用法1
 # class Application(tornado.web.Application):
 #     def __init__(self):
-#         super(Application, self).__init__(handlers=route.route_table())
+#         super(Application, self).__init__(handlers=route.routes())
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     app = Application()
 
     # 用法2
-    route.route_table(app)
+    route.register_routes(app)
 
     server = tornado.httpserver.HTTPServer(app)
     server.listen(8888, '0.0.0.0')

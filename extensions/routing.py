@@ -17,7 +17,7 @@ class AboutHandler(tornado.web.RequestHandler):
 路由表生成方法1:
 class Application(tornado.web.Application):
     def __init__(self):
-        super(Application, self).__init__(handlers=route.route_table())
+        super(Application, self).__init__(handlers=route.routes())
 
 路由表生成方法2:
 class Application(tornado.web.Application):
@@ -25,12 +25,12 @@ class Application(tornado.web.Application):
         super(Application, self).__init__()
 
 app = Application()
-route.route_table(app)
+route.register_routes(app)
 """
 
 from itertools import chain
 
-from tornado.web import URLSpec
+from tornado.web import URLSpec, Application
 
 
 class _Route(object):
@@ -55,15 +55,19 @@ class _Route(object):
         self.__class__._route_table[self.host].append(url)
 
     @classmethod
-    def route_table(cls, app=None):
+    def routes(cls):
         u"""
-        读取所有路由条目
-        如果 app 不为 None，则直接注册到 Application 中
+        获取所有路由条目
         """
-        if app is not None:
-            [app.add_handlers(pattern, handler) for pattern, handler in cls._route_table.items()]
-        else:
-            return chain(*cls._route_table.values())
+        return chain(*cls._route_table.values())
+
+    @classmethod
+    def register_routes(cls, app):
+        u"""
+        将路由条目注册到 `Application` 中
+        :type app: Application
+        """
+        [app.add_handlers(pattern, handler) for pattern, handler in cls._route_table.items()]
 
 
 route = _Route
